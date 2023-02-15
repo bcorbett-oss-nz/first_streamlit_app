@@ -10,18 +10,17 @@ def get_fruityvice_data(this_fruit_choice):
   fruityvice_normalized = pandas.json_normalize(fruityvice_response.json())
   return fruityvice_normalized
   
-def get_fruit_load_list():
+def get_fruit_load_list(my_cnx):
   with my_cnx.cursor() as my_cur:
     my_cur.execute("select * from fruit_load_list")
     return my_cur.fetchall()
   
-def insert_row_snowflake(new_fruit):
+def insert_row_snowflake(my_cnx, new_fruit):
   with my_cnx.cursor() as my_cur:
     my_cur.execute("insert into fruit_load_list (fruit_name) values (" + "'" + new_fruit + "')")
     return "Thanks for adding " + new_fruit
 
   
-my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
 my_fruit_list = pandas.read_csv("https://uni-lab-files.s3.us-west-2.amazonaws.com/dabw/fruit_macros.txt")
 
 my_fruit_list = my_fruit_list.set_index('Fruit')
@@ -47,13 +46,16 @@ streamlit.dataframe(fruits_to_show)
 
 # Add a button to load the fruit
 if streamlit.button('Get fruit load list'):
-  my_data_rows = get_fruit_load_list()
+  my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
+  my_data_rows = get_fruit_load_list(my_cnx)
+  my_cnx.close()
   streamlit.dataframe(my_data_rows)
 
 add_my_fruit = streamlit.text_input('What fruit to add to the list? ')
 if streamlit.button('add a fruit to the list'):
   my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
-  back_from_function = insert_row_snowflake(add_my_fruit)
+  back_from_function = insert_row_snowflake(my_cnx, add_my_fruit)
+  my_cnx.close()
   streamlit.text(back_from_function)
 
 # New section to display fruityvice api response
@@ -69,13 +71,6 @@ try:
 except URLError as e:
   streamlit.error()
   
-streamlit.write('The user entered: ', fruit_choice)
-
-
-
-
-
-my_cur = my_cnx.cursor()
 
 streamlit.stop()
 
