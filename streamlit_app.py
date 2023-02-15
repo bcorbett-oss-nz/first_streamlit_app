@@ -42,7 +42,7 @@ fruits_to_show = my_fruit_list.loc[fruits_selected]
 # Display the table on the page.
 
 streamlit.dataframe(fruits_to_show)
-
+streamlit.header('View our fruit list - add your own')
 
 # Add a button to load the fruit
 if streamlit.button('Get fruit load list'):
