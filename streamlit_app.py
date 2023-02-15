@@ -15,7 +15,11 @@ def get_fruit_load_list():
     my_cur.execute("select * from fruit_load_list")
     return my_cur.fetchall()
   
-  
+def insert_row_snowflake(new_fruit):
+  with my_cnx.cursor() as my_cur:
+    my_cur.execute("insert into fruit_load_list (fruit_name) values (" + "'" + new_fruit + "')")
+    return "Thanks for adding " + new_fruit)
+
 my_fruit_list = pandas.read_csv("https://uni-lab-files.s3.us-west-2.amazonaws.com/dabw/fruit_macros.txt")
 
 my_fruit_list = my_fruit_list.set_index('Fruit')
@@ -41,10 +45,13 @@ streamlit.dataframe(fruits_to_show)
 
 # Add a button to load the fruit
 if streamlit.button('Get fruit load list'):
-  my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
   my_data_rows = get_fruit_load_list()
   streamlit.dataframe(my_data_rows)
 
+if streamlit.button('add a fruit to the list'):
+  my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
+  back_from_function = insert_row_snowflake(add_my_fruit)
+  streamlit.text(back_from_function)
 
 # New section to display fruityvice api response
 
@@ -76,7 +83,7 @@ streamlit.stop()
 
 add_my_fruit = streamlit.text_input('What fruit to add? ', 'Durian')
 streamlit.write('The user entered: ', add_my_fruit)
-my_cur.execute("insert into fruit_load_list (fruit_name) values (" + "'" + add_my_fruit + "')")
+
 my_cur.execute("select * from fruit_load_list")
 my_data_rows = my_cur.fetchall()
 streamlit.header("The fruit load list now contains: " )
