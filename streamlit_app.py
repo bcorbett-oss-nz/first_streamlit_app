@@ -20,6 +20,8 @@ def insert_row_snowflake(new_fruit):
     my_cur.execute("insert into fruit_load_list (fruit_name) values ('new_fruit')")
     return "Thanks for adding " + new_fruit
 
+  
+my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
 my_fruit_list = pandas.read_csv("https://uni-lab-files.s3.us-west-2.amazonaws.com/dabw/fruit_macros.txt")
 
 my_fruit_list = my_fruit_list.set_index('Fruit')
@@ -72,7 +74,7 @@ streamlit.write('The user entered: ', fruit_choice)
 
 
 
-my_cnx = snowflake.connector.connect(**streamlit.secrets["snowflake"])
+
 my_cur = my_cnx.cursor()
 
 streamlit.stop()
